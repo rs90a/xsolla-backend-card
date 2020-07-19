@@ -1,0 +1,133 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Payment System API",
+    "description": "Реализация API для платёжной системы, которая имитирует процесс оплаты банковской картой.",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/Payment/Session": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Payment/Begin": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentByCard"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PaymentInfo": {
+        "required": [
+          "amount",
+          "purpose"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "maximum": 1000000,
+            "minimum": 1,
+            "type": "number",
+            "format": "double"
+          },
+          "purpose": {
+            "type": "string"
+          }
+        }
+      },
+      "Date": {
+        "required": [
+          "month",
+          "year"
+        ],
+        "type": "object",
+        "properties": {
+          "month": {
+            "maximum": 12,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "maximum": 9999,
+            "minimum": 2000,
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CardInfo": {
+        "required": [
+          "cvc",
+          "number"
+        ],
+        "type": "object",
+        "properties": {
+          "number": {
+            "maxLength": 19,
+            "minLength": 8,
+            "type": "string"
+          },
+          "cvc": {
+            "maximum": 999,
+            "minimum": 100,
+            "type": "integer",
+            "format": "int32"
+          },
+          "date": {
+            "$ref": "#/components/schemas/Date"
+          }
+        }
+      },
+      "PaymentByCard": {
+        "required": [
+          "card",
+          "sessionId"
+        ],
+        "type": "object",
+        "properties": {
+          "card": {
+            "$ref": "#/components/schemas/CardInfo"
+          },
+          "sessionId": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
