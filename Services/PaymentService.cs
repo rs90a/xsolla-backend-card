@@ -1,18 +1,20 @@
 ﻿using System;
 using xsolla_backend_card.Cache;
+using xsolla_backend_card.Interfaces;
+using xsolla_backend_card.Logics;
 using xsolla_backend_card.Models;
 
-namespace xsolla_backend_card.Logics
+namespace xsolla_backend_card.Services
 {
-    public class Processing
+    public class PaymentService : IPaymentService
     {
         private readonly ICache cache;
 
-        public Processing(ICache cache)
+        public PaymentService(ICache cache)
         {
             this.cache = cache;
         }
-
+        
         /// <summary>
         /// Создание сессии
         /// </summary>

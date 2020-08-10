@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using xsolla_backend_card.Cache;
-using xsolla_backend_card.Logics;
+using xsolla_backend_card.Interfaces;
 using xsolla_backend_card.Models;
 
 namespace xsolla_backend_card.Controllers
@@ -10,13 +9,11 @@ namespace xsolla_backend_card.Controllers
     [Route("api/[controller]")]
     public class PaymentController : ControllerBase
     {
-        private readonly ICache cache;
-        private readonly Processing processing;
+        private readonly IPaymentService paymentService;
         
-        public PaymentController(ICache cache)
+        public PaymentController(IPaymentService paymentService)
         {
-            this.cache = cache;
-            processing = new Processing(cache);
+            this.paymentService = paymentService;
         }
 
         /// <summary>
@@ -29,7 +26,7 @@ namespace xsolla_backend_card.Controllers
         {
             try
             {
-                string sessionId = processing.CreateSession(paymentInfo);
+                string sessionId = paymentService.CreateSession(paymentInfo);
                 return new OkObjectResult(new {sessionId});
             }
             catch (Exception e)
@@ -52,7 +49,7 @@ namespace xsolla_backend_card.Controllers
         {
             try
             {
-                PaymentInfo paymentInfo = processing.BillPayment(paymentByCard);
+                PaymentInfo paymentInfo = paymentService.BillPayment(paymentByCard);
                 return new OkObjectResult(new
                 {
                     message = "Платеж выполнен успешно.",

@@ -20,7 +20,6 @@ namespace xsolla_backend_card
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton<Cache.ICache, Cache.Cache>();
             services.AddMemoryCache();
             services.AddSwaggerGen(c =>
             {
@@ -31,6 +30,9 @@ namespace xsolla_backend_card
                     Description = "Реализация API для платёжной системы, которая имитирует процесс оплаты банковской картой."
                 });
             });
+            
+            services.AddSingleton<Cache.ICache, Cache.Cache>();
+            services.AddSingleton<Interfaces.IPaymentService, Services.PaymentService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,15 +44,10 @@ namespace xsolla_backend_card
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-
             app.UseSwagger();
-            
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Payment System API");
