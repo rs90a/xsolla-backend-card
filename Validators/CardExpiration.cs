@@ -16,7 +16,7 @@ namespace xsolla_backend_card.Validators
         {
             Date dateExp = (Date)validationContext.ObjectInstance;
             
-            if (dateExp.Year >= DateTime.Now.Year && dateExp.Month >= DateTime.Now.Month)
+            if (dateExp.Year > DateTime.Now.Year || dateExp.Year == DateTime.Now.Year && dateExp.Month >= DateTime.Now.Month)
                 return ValidationResult.Success;
             
             return new ValidationResult(GetErrorMessage());
