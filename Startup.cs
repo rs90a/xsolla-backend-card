@@ -1,9 +1,14 @@
+using System;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using xsolla_backend_card.Auth;
 
 namespace xsolla_backend_card
 {
@@ -19,6 +24,12 @@ namespace xsolla_backend_card
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var jwtSection = Configuration.GetSection("JWT")
+                             ?? throw new ArgumentException("JWT-константы не определены");
+            
+            //Внедрение зависимости - JWT-константы из appsettings.json
+            services.Configure<JWT>(jwtSection);
+
             services.AddControllers();
             services.AddMemoryCache();
             services.AddSwaggerGen(c =>
@@ -30,9 +41,24 @@ namespace xsolla_backend_card
                     Description = "Реализация API для платёжной системы, которая имитирует процесс оплаты банковской картой."
                 });
             });
-            
+
+            //Внедрение зависимостей - сервисы
             services.AddSingleton<Cache.ICache, Cache.Cache>();
             services.AddSingleton<Interfaces.IPaymentService, Services.PaymentService>();
+            services.AddSingleton<Interfaces.IAccountService, Services.AccountService>();
+            
+            //Конфигурация аутентификации
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidIssuer = jwtSection.GetValue<string>("Issuer"),
+                        ValidAudience = jwtSection.GetValue<string>("Audience"),
+                        ValidateLifetime = false,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection.GetValue<string>("Key")))
+                    };
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,6 +71,7 @@ namespace xsolla_backend_card
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             app.UseSwagger();
