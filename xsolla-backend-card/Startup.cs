@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -55,8 +54,9 @@ namespace xsolla_backend_card
                     {
                         ValidIssuer = jwtSection.GetValue<string>("Issuer"),
                         ValidAudience = jwtSection.GetValue<string>("Audience"),
-                        ValidateLifetime = false,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection.GetValue<string>("Key")))
+                        ValidateLifetime = true,
+                        LifetimeValidator = JWT.LifeTimeValidator,
+                        IssuerSigningKey = JWT.GetSecurityKey(jwtSection.GetValue<string>("Key"))
                     };
                 });
         }
