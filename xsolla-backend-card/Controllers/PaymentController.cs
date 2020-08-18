@@ -7,6 +7,7 @@ using xsolla_backend_card.Models;
 namespace xsolla_backend_card.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class PaymentController : ControllerBase
     {
@@ -22,7 +23,7 @@ namespace xsolla_backend_card.Controllers
         /// </summary>
         /// <param name="paymentInfo">Сведения о платеже</param>
         /// <returns>Id сессии</returns>
-        [Authorize, HttpPost("[action]")]
+        [HttpPost("[action]")]
         public IActionResult Session(PaymentInfo paymentInfo)
         {
             try
@@ -45,7 +46,7 @@ namespace xsolla_backend_card.Controllers
         /// <param name="cardInfo">Сведения о карте</param>
         /// <param name="sessionId">Id сессии</param>
         /// <returns>Сообщение о статусе платежа</returns>
-        [Authorize, HttpPost("[action]")]
+        [HttpPost("[action]")]
         public IActionResult Begin(PaymentByCard paymentByCard)
         {
             try

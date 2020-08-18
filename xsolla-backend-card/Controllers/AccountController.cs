@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using xsolla_backend_card.Interfaces;
 using xsolla_backend_card.Models;
@@ -6,6 +7,7 @@ using xsolla_backend_card.Models;
 namespace xsolla_backend_card.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
@@ -16,7 +18,7 @@ namespace xsolla_backend_card.Controllers
             this.accountService = accountService;
         }
 
-        [HttpPost("[action]")]
+        [AllowAnonymous, HttpPost("[action]")]
         public IActionResult Token([FromBody]User user)
         {
             try

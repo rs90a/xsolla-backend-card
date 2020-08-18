@@ -2,12 +2,14 @@ using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using xsolla_backend_card.Auth;
+using xsolla_backend_card.Middleware;
 
 namespace xsolla_backend_card
 {
@@ -45,7 +47,8 @@ namespace xsolla_backend_card
             services.AddSingleton<Cache.ICache, Cache.Cache>();
             services.AddSingleton<Interfaces.IPaymentService, Services.PaymentService>();
             services.AddSingleton<Interfaces.IAccountService, Services.AccountService>();
-            
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             //Конфигурация аутентификации
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -73,6 +76,10 @@ namespace xsolla_backend_card
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseWhen(
+                context => !context.Request.Path.StartsWithSegments("/api/Account/Token"),
+                appBuilder => appBuilder.UseTokenContext()
+            );
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             app.UseSwagger();
             app.UseSwaggerUI(c =>
